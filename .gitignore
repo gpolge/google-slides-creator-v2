@@ -1,0 +1,16 @@
+# OAuth credentials & tokens — never commit these
+credentials.json
+token.pickle
+deck_config.json
+
+# Inspection output (large JSON dumps)
+inspect_*.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+
+# Output files
+output/
