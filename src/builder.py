@@ -74,6 +74,8 @@ class DeckBuilder:
         slide_id = api.new_id()
         reqs = [api.add_slide(slide_id, layout="BLANK")]
         reqs.append(api.set_slide_background(slide_id, bg))
+        # Always add the orange review banner — remove before sharing
+        reqs.extend(api.add_ai_review_banner(slide_id))
         self._flush(reqs)
         self._slides_order.append(slide_id)
         return slide_id

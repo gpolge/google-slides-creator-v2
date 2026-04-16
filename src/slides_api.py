@@ -283,6 +283,36 @@ def add_sheets_chart(
 
 
 # ─────────────────────────────────────────────
+# AI REVIEW BANNER
+# ─────────────────────────────────────────────
+
+BANNER_COLOR  = "#FF6B00"   # vivid orange
+BANNER_TEXT   = "⚠  Edited with AI. Please review before sharing."
+BANNER_HEIGHT = 0.19        # inches — thin strip at top of slide
+
+def add_ai_review_banner(slide_id: str) -> list:
+    """
+    Add a thin orange banner at the very top of a slide.
+    Must be removed manually before sharing the deck.
+    Returns a list of batchUpdate request dicts.
+    """
+    obj_id = new_id()
+    return add_text_box(
+        obj_id=obj_id,
+        slide_id=slide_id,
+        text=BANNER_TEXT,
+        x=0, y=0,
+        w=10.0, h=BANNER_HEIGHT,
+        font_size_pt=7,
+        bold=True,
+        color="#FFFFFF",
+        bg_color=BANNER_COLOR,
+        align="CENTER",
+        v_align="MIDDLE",
+    )
+
+
+# ─────────────────────────────────────────────
 # REPLACE TEXT (template placeholders)
 # ─────────────────────────────────────────────
 

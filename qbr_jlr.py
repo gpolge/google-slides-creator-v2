@@ -300,6 +300,22 @@ def build_replacements(c: dict) -> list:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# AI REVIEW BANNER — stamp every slide after template copy
+# ─────────────────────────────────────────────────────────────────────────────
+
+def stamp_ai_review_banners(slides_svc, pres_id: str):
+    """Add the orange 'Edited with AI' banner to every slide in the presentation."""
+    print("  Stamping AI review banners on all slides...")
+    pres = slides_svc.presentations().get(presentationId=pres_id).execute()
+    reqs = []
+    for slide in pres.get("slides", []):
+        reqs.extend(api.add_ai_review_banner(slide["objectId"]))
+    for i in range(0, len(reqs), 50):
+        api.batch_update(slides_svc, pres_id, reqs[i:i+50])
+    print(f"  ✅ Banners added to {len(pres.get('slides', []))} slides")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # CHART — Credits used Oct–Mar
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -389,7 +405,10 @@ def main():
         # 3. Inject usage chart
         inject_usage_chart(slides_svc, sheets_svc, pres_id, CUSTOMER)
 
-        # 4. Done
+        # 4. Stamp AI review banners on every slide
+        stamp_ai_review_banners(slides_svc, pres_id)
+
+        # 5. Done
         url = f"https://docs.google.com/presentation/d/{pres_id}/edit"
         print(f"\n✅  {deck_title}")
         print(f"    {url}\n")
