@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src.auth import get_services
 from src import slides_api as api
 from src import sheets_charts as sc
+from src.drive import copy_template, OUTPUT_FOLDER_ID
 
 TEMPLATE_ID = "1KpYl6uTcUMBUFCHnMGkRXJVuxhcdsHrhDnzbZRQKNmo"
 
@@ -236,15 +237,12 @@ def main():
     print("Authenticating with Google...")
     slides_svc, drive_svc, sheets_svc = get_services()
 
-    # 1. Copy the template
-    print(f"Copying template...")
+    # 1. Copy the template directly into the shared output folder
     deck_title = f"{CUSTOMER['name']} QBR {CUSTOMER['quarter']}"
-    copy = drive_svc.files().copy(
-        fileId=TEMPLATE_ID,
-        body={"name": deck_title},
-    ).execute()
-    pres_id = copy["id"]
+    print(f"Copying template into shared folder...")
+    pres_id = copy_template(drive_svc, TEMPLATE_ID, deck_title)
     print(f"  Created: https://docs.google.com/presentation/d/{pres_id}/edit")
+    print(f"  Folder:  https://drive.google.com/drive/folders/{OUTPUT_FOLDER_ID}")
 
     try:
         # 2. Replace all text placeholders

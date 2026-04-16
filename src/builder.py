@@ -6,6 +6,7 @@ Handles the full lifecycle: create → populate → add charts → return URL.
 from . import slides_api as api
 from . import colors as C
 from . import sheets_charts as sc
+from .drive import OUTPUT_FOLDER_ID
 
 # Google Slides canvas: 10 × 5.625 inches (widescreen 16:9)
 SLIDE_W = 10.0
@@ -43,10 +44,22 @@ class DeckBuilder:
             self.pres_id = presentation_id
             self.title   = api.get_presentation(slides_service, presentation_id).get("title", "AI Slides")
         else:
-            # Create new deck
+            # Create new deck then move it into the shared output folder
             self.title = title or "AI Slides"
             pres = api.create_presentation(slides_service, self.title)
             self.pres_id = pres["presentationId"]
+            # Move into shared folder
+            try:
+                f = drive_service.files().get(fileId=self.pres_id, fields="parents").execute()
+                previous_parents = ",".join(f.get("parents", []))
+                drive_service.files().update(
+                    fileId=self.pres_id,
+                    addParents=OUTPUT_FOLDER_ID,
+                    removeParents=previous_parents,
+                    fields="id,parents",
+                ).execute()
+            except Exception:
+                pass  # non-fatal if folder move fails
             # Delete the default blank slide that Google adds automatically
             default_slide = pres["slides"][0]["objectId"]
             self._flush([api.delete_slide(default_slide)])

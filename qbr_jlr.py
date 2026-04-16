@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from src.auth import get_services
 from src import slides_api as api
 from src import sheets_charts as sc
+from src.drive import copy_template, OUTPUT_FOLDER_ID
 
 TEMPLATE_ID = "1KpYl6uTcUMBUFCHnMGkRXJVuxhcdsHrhDnzbZRQKNmo"
 
@@ -355,15 +356,12 @@ def main():
     print("Authenticating with Google...")
     slides_svc, drive_svc, sheets_svc = get_services()
 
-    # 1. Copy the template (preserves ALL design: fonts, master, colors, images)
+    # 1. Copy the template directly into the shared output folder
     deck_title = f"{CUSTOMER['short']} <> Maze Partnership Review {CUSTOMER['quarter']}"
     print(f"Copying template → '{deck_title}'...")
-    copy = drive_svc.files().copy(
-        fileId=TEMPLATE_ID,
-        body={"name": deck_title},
-    ).execute()
-    pres_id = copy["id"]
-    print(f"  Draft: https://docs.google.com/presentation/d/{pres_id}/edit")
+    pres_id = copy_template(drive_svc, TEMPLATE_ID, deck_title)
+    print(f"  Created: https://docs.google.com/presentation/d/{pres_id}/edit")
+    print(f"  Folder:  https://drive.google.com/drive/folders/{OUTPUT_FOLDER_ID}")
 
     try:
         # 2. Apply all text replacements
